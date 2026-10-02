@@ -13,8 +13,11 @@ require CSSC_DIR . '/inc/customizer.php';
 require CSSC_DIR . '/inc/sections.php';
 require CSSC_DIR . '/inc/about.php';
 require CSSC_DIR . '/inc/woocommerce.php';
+require CSSC_DIR . '/inc/product-fields.php';
 require CSSC_DIR . '/inc/elementor/loader.php';
 require CSSC_DIR . '/inc/generator.php';
+require CSSC_DIR . '/inc/ajax-product-search.php';
+
 
 add_action( 'after_setup_theme', function () {
 	load_theme_textdomain( 'css-cable', CSSC_DIR . '/languages' );
@@ -46,6 +49,43 @@ add_action( 'after_setup_theme', function () {
 add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_style( 'cssc-fonts', 'https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700;800;900&display=swap', array(), null );
 	wp_enqueue_style( 'cssc-main', CSSC_URI . '/assets/css/main.css', array(), CSSC_VER );
+	if ( class_exists( 'WooCommerce' ) ) {
+	wp_enqueue_style(
+		'cssc-product-search',
+		CSSC_URI . '/assets/css/product-search.css',
+		array( 'cssc-main' ),
+		CSSC_VER
+	);
+
+	wp_enqueue_script(
+		'cssc-product-search',
+		CSSC_URI . '/assets/js/product-search.js',
+		array(),
+		CSSC_VER,
+		true
+	);
+
+	wp_localize_script(
+		'cssc-product-search',
+		'CSSC_PRODUCT_SEARCH',
+		array(
+			'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( 'cssc_product_search' ),
+			'minChars' => 2,
+			'labels'   => array(
+				'start'   => 'Начните вводить название или артикул товара',
+				'loading' => 'Ищем товары…',
+				'empty'   => 'По вашему запросу товары не найдены',
+				'error'   => 'Не удалось выполнить поиск. Попробуйте ещё раз.',
+				'viewAll' => 'Показать все результаты',
+				'sku'     => 'Артикул:',
+			),
+		)
+	);
+}
+
+	wp_enqueue_style('cssc-floating-bar', CSSC_URI . '/assets/css/floating-bar.css', array( 'cssc-main' ),	CSSC_VER);
+
 	if ( class_exists( 'WooCommerce' ) ) {
 		wp_enqueue_style( 'cssc-woo', CSSC_URI . '/assets/css/woocommerce.css', array( 'cssc-main' ), CSSC_VER );
 	}
@@ -105,3 +145,81 @@ add_filter( 'body_class', function ( $c ) {
 	}
 	return $c;
 } );
+
+/**
+ * Активный пункт «Продукция» для магазина WooCommerce,
+ * категорий товаров и отдельных карточек товара.
+ */
+add_filter(
+	'nav_menu_css_class',
+	function ( $classes, $item, $args ) {
+
+		if (
+			empty( $args->theme_location ) ||
+			'primary' !== $args->theme_location
+		) {
+			return $classes;
+		}
+
+		$is_product_section =
+			is_post_type_archive( 'product' ) ||
+			is_singular( 'product' ) ||
+			is_tax( array( 'product_cat', 'product_tag' ) );
+
+		if ( ! $is_product_section ) {
+			return $classes;
+		}
+
+		/* Убираем ошибочную активность с других пунктов. */
+		$classes = array_diff(
+			$classes,
+			array(
+				'current-menu-item',
+				'current-menu-parent',
+				'current-menu-ancestor',
+				'current_page_item',
+				'current_page_parent',
+				'current_page_ancestor',
+			)
+		);
+
+		$item_url   = isset( $item->url ) ? $item->url : '';
+		$item_query = wp_parse_url( $item_url, PHP_URL_QUERY );
+		$query      = array();
+
+		if ( $item_query ) {
+			parse_str( $item_query, $query );
+		}
+
+		$is_product_item =
+			(
+				isset( $item->type, $item->object ) &&
+				'post_type_archive' === $item->type &&
+				'product' === $item->object
+			) ||
+			(
+				isset( $query['post_type'] ) &&
+				'product' === $query['post_type']
+			);
+
+		/* Дополнительная проверка по адресу страницы магазина. */
+		if ( function_exists( 'wc_get_page_permalink' ) ) {
+			$shop_url = wc_get_page_permalink( 'shop' );
+
+			if (
+				$shop_url &&
+				untrailingslashit( $item_url ) === untrailingslashit( $shop_url )
+			) {
+				$is_product_item = true;
+			}
+		}
+
+		if ( $is_product_item ) {
+			$classes[] = 'current-menu-item';
+		}
+
+		return array_values( array_unique( $classes ) );
+	},
+	10,
+	3
+);

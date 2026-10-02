@@ -16,17 +16,101 @@ add_action( 'wp_footer', function () {
 			<?php else : ?>
 				<h3>Оставить заявку</h3>
 				<p>Укажите контакты и необходимую продукцию — мы подготовим коммерческое предложение.</p>
-				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="req-form">
-					<input type="hidden" name="action" value="cssc_request">
-					<input type="hidden" name="product" value="" data-req-product>
-					<?php wp_nonce_field( 'cssc_request', 'cssc_nonce' ); ?>
-					<input type="text" name="website" class="hp" tabindex="-1" autocomplete="off">
-					<label><span>Имя*</span><input type="text" name="name" required></label>
-					<label><span>Телефон*</span><input type="tel" name="phone" required></label>
-					<label><span>E-mail</span><input type="email" name="email"></label>
-					<label><span>Комментарий / марка кабеля, метраж</span><textarea name="message" rows="3"></textarea></label>
-					<button class="btn btn--accent btn--lg" type="submit"><span>Отправить</span><?php echo cssc_arrow_btn_icon(); // phpcs:ignore ?></button>
-				</form>
+				<form
+	method="post"
+	action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
+	class="req-form req-form--product"
+>
+	<input type="hidden" name="action" value="cssc_request">
+
+	<?php wp_nonce_field( 'cssc_request', 'cssc_nonce' ); ?>
+
+	<input
+		type="text"
+		name="website"
+		class="hp"
+		tabindex="-1"
+		autocomplete="off"
+		aria-hidden="true"
+	>
+
+	<label class="req-form__field req-form__field--product">
+		<span>Выбранный кабель</span>
+
+		<input
+			type="text"
+			name="product"
+			value=""
+			data-req-product
+			readonly
+			required
+		>
+	</label>
+
+	<div class="req-form__row">
+		<label class="req-form__field">
+			<span>Ваше имя*</span>
+
+			<input
+				type="text"
+				name="name"
+				autocomplete="name"
+				required
+			>
+		</label>
+
+		<label class="req-form__field">
+			<span>Телефон*</span>
+
+			<input
+				type="tel"
+				name="phone"
+				inputmode="tel"
+				autocomplete="tel"
+				placeholder="+7 (___) ___-__-__"
+				required
+			>
+		</label>
+	</div>
+
+	<label class="req-form__field">
+		<span>Метраж*</span>
+
+		<div class="req-form__quantity">
+			<input
+				type="number"
+				name="quantity"
+				min="1"
+				step="1"
+				value="1000"
+				inputmode="numeric"
+				required
+			>
+
+			<span class="req-form__unit">м</span>
+		</div>
+	</label>
+
+	<label class="req-form__agree">
+		<input
+			type="checkbox"
+			name="agreement"
+			value="1"
+			required
+		>
+
+		<span>
+			Я согласен на обработку персональных данных
+		</span>
+	</label>
+
+	<button class="req-form__submit" type="submit">
+		<span>Отправить заявку</span>
+
+		<?php echo cssc_arrow_btn_icon(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+	</button>
+</form>
+
 			<?php endif; ?>
 		</div>
 	</div>
@@ -41,14 +125,54 @@ function cssc_handle_request() {
 		wp_safe_redirect( home_url( '/' ) );
 		exit;
 	}
-	$name    = sanitize_text_field( wp_unslash( $_POST['name'] ?? '' ) );
-	$phone   = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
-	$email   = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
-	$msg     = sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) );
-	$product = sanitize_text_field( wp_unslash( $_POST['product'] ?? '' ) );
+	$name = sanitize_text_field(
+	wp_unslash( $_POST['name'] ?? '' )
+);
+
+$phone = sanitize_text_field(
+	wp_unslash( $_POST['phone'] ?? '' )
+);
+
+$product = sanitize_text_field(
+	wp_unslash( $_POST['product'] ?? '' )
+);
+
+$quantity = absint(
+	$_POST['quantity'] ?? 0
+);
+
+$agreement = ! empty( $_POST['agreement'] );
+
+if (
+	'' === $name ||
+	'' === $phone ||
+	'' === $product ||
+	$quantity < 1 ||
+	! $agreement
+) {
+	wp_die(
+		esc_html__( 'Заполните все обязательные поля.', 'css-cable' ),
+		esc_html__( 'Ошибка отправки', 'css-cable' ),
+		array( 'response' => 400 )
+	);
+}
+
 	$to      = cssc_opt( 'cssc_email' ) ? cssc_opt( 'cssc_email' ) : get_option( 'admin_email' );
-	$body    = "Имя: $name\nТелефон: $phone\nE-mail: $email\nТовар: $product\n\n$msg";
-	wp_mail( $to, 'Заявка с сайта ' . get_bloginfo( 'name' ), $body, $email ? array( 'Reply-To: ' . $email ) : array() );
+	$page_url = wp_get_referer() ?: home_url( '/' );
+
+$body  = "Новая заявка с сайта\n\n";
+$body .= "Кабель: {$product}\n";
+$body .= "Метраж: {$quantity} м\n";
+$body .= "Имя: {$name}\n";
+$body .= "Телефон: {$phone}\n";
+$body .= "Страница товара: {$page_url}\n";
+
+	wp_mail(
+	$to,
+	'Заявка на кабель: ' . $product,
+	$body,
+	array( 'Content-Type: text/plain; charset=UTF-8' )
+);
 	$ref = wp_get_referer() ? wp_get_referer() : home_url( '/' );
 	wp_safe_redirect( add_query_arg( 'cssc_sent', 1, remove_query_arg( 'cssc_sent', $ref ) ) );
 	exit;

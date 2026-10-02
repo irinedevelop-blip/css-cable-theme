@@ -1,0 +1,338 @@
+/* ==========================================================
+   CSS Cable — fixed bottom bar
+   ========================================================== */
+
+:root {
+	--floating-bar-height: 64px;
+}
+
+body {
+	padding-bottom: var(--floating-bar-height);
+}
+
+.floating-bar {
+	position: fixed;
+	z-index: 900;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: var(--floating-bar-height);
+	color: #172033;
+	background: #fff;
+	border-top: 1px solid #e7e9ed;
+	box-shadow: 0 -8px 28px rgba(13, 25, 43, 0.08);
+}
+
+.floating-bar__inner {
+	display: grid;
+	grid-template-columns:
+		clamp(92px, 11vw, 146px)
+		minmax(280px, 1fr)
+		auto
+		var(--floating-bar-height);
+	align-items: stretch;
+	width: 100%;
+	height: 100%;
+	padding-left: clamp(24px, 3.6vw, 58px);
+}
+
+.floating-bar__logo {
+	position: relative;
+	display: flex;
+	align-items: center;
+	min-width: 0;
+}
+
+/* Красный индикатор активного раздела */
+
+.floating-bar__logo::before,
+.floating-bar__menu > li::before {
+	position: absolute;
+	z-index: 2;
+	top: 0;
+	width: 3px;
+	height: 15px;
+	background: var(--c-accent);
+	content: "";
+}
+
+/* По умолчанию метка над логотипом скрыта */
+
+.floating-bar__logo::before {
+	left: 20px;
+	display: none;
+}
+
+/* На главной странице метка находится над логотипом */
+
+body.home .floating-bar__logo::before,
+body.front-page .floating-bar__logo::before {
+	display: block;
+}
+
+/* Подготовка пунктов меню */
+
+.floating-bar__menu > li {
+	position: relative;
+	display: flex;
+	align-items: center;
+	height: var(--floating-bar-height);
+}
+
+/* Метки пунктов меню по умолчанию скрыты */
+
+.floating-bar__menu > li::before {
+	left: 50%;
+	display: none;
+	transform: translateX(-50%);
+}
+
+/* На внутренних страницах показываем метку активного раздела */
+
+body:not(.home) .floating-bar__menu > .current-menu-item::before,
+body:not(.home) .floating-bar__menu > .current-menu-parent::before,
+body:not(.home) .floating-bar__menu > .current-menu-ancestor::before,
+body:not(.home) .floating-bar__menu > .current_page_item::before,
+body:not(.home) .floating-bar__menu > .current_page_parent::before,
+body:not(.home) .floating-bar__menu > .current_page_ancestor::before {
+	display: block;
+}
+
+
+.floating-bar__logo .custom-logo-link {
+	display: flex;
+	align-items: center;
+}
+
+.floating-bar__logo .custom-logo {
+	display: block;
+	width: auto;
+	max-width: 72px;
+	max-height: 42px;
+	object-fit: contain;
+}
+
+.floating-bar__navigation {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+	padding: 0 clamp(16px, 2vw, 34px);
+}
+
+.floating-bar__menu {
+	display: flex;
+	align-items: center;
+	gap: clamp(18px, 2.2vw, 38px);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.floating-bar__menu li {
+	position: relative;
+	margin: 0;
+	padding: 0;
+}
+
+
+.floating-bar__menu a {
+	position: relative;
+	display: flex;
+	align-items: center;
+	height: var(--floating-bar-height);
+	color: #172033;
+	font-size: 10px;
+	font-weight: 400;
+	line-height: 1.2;
+	white-space: nowrap;
+	transition: color 180ms ease;
+}
+
+.floating-bar__menu a::after {
+	position: absolute;
+	right: 0;
+	bottom: 16px;
+	left: 0;
+	height: 1px;
+	background: var(--c-accent);
+	transform: scaleX(0);
+	transform-origin: right center;
+	transition: transform 180ms ease;
+	content: "";
+}
+
+.floating-bar__menu a:hover,
+.floating-bar__menu .current-menu-item > a {
+	color: var(--c-accent);
+}
+
+.floating-bar__menu a:hover::after,
+.floating-bar__menu .current-menu-item > a::after {
+	transform: scaleX(1);
+	transform-origin: left center;
+}
+
+.floating-bar__contacts {
+	display: flex;
+	align-items: stretch;
+	min-width: 0;
+}
+
+.floating-bar__contact {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-width: 0;
+	padding: 0 clamp(12px, 1.5vw, 24px);
+	color: #172033;
+	border-left: 1px solid #f0f1f3;
+	transition:
+		color 180ms ease,
+		background-color 180ms ease;
+}
+
+.floating-bar__contact:hover {
+	color: var(--c-accent);
+	background: #fafafb;
+}
+
+.floating-bar__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 23px;
+	width: 23px;
+	height: 23px;
+	color: #fff;
+	background: var(--c-accent);
+	border-radius: 50%;
+}
+
+.floating-bar__icon .ico {
+	width: 11px;
+	height: 11px;
+}
+
+.floating-bar__text {
+	display: block;
+	overflow: hidden;
+	max-width: 128px;
+	font-size: 9px;
+	font-weight: 400;
+	line-height: 1.35;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.floating-bar__contact--address .floating-bar__text {
+	max-width: 170px;
+	white-space: normal;
+}
+
+.floating-bar__whatsapp {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--floating-bar-height);
+	height: var(--floating-bar-height);
+	color: #fff;
+	background: var(--c-accent);
+	transition: background-color 180ms ease;
+}
+
+.floating-bar__whatsapp:hover {
+	background: #a83d47;
+}
+
+.floating-bar__whatsapp .ico {
+	width: 28px;
+	height: 28px;
+}
+
+@media (max-width: 1180px) {
+	.floating-bar__inner {
+		grid-template-columns: 100px minmax(240px, 1fr) auto var(--floating-bar-height);
+		padding-left: 22px;
+	}
+
+	.floating-bar__navigation {
+		padding-right: 16px;
+		padding-left: 16px;
+	}
+
+	.floating-bar__menu {
+		gap: 20px;
+	}
+
+	.floating-bar__contact {
+		padding-right: 12px;
+		padding-left: 12px;
+	}
+
+	.floating-bar__contact--address {
+		display: none;
+	}
+}
+
+@media (max-width: 900px) {
+	.floating-bar__inner {
+		grid-template-columns: 92px minmax(0, 1fr) auto var(--floating-bar-height);
+	}
+
+	.floating-bar__navigation {
+		display: none;
+	}
+
+	.floating-bar__contacts {
+		grid-column: 3;
+	}
+
+	.floating-bar__contact {
+		padding-right: 15px;
+		padding-left: 15px;
+	}
+
+	.floating-bar__contact .floating-bar__text {
+		display: none;
+	}
+
+	.floating-bar__contact--address {
+		display: none;
+	}
+}
+
+@media (max-width: 520px) {
+	:root {
+		--floating-bar-height: 58px;
+	}
+
+	.floating-bar__inner {
+		grid-template-columns: minmax(84px, 1fr) auto var(--floating-bar-height);
+		padding-left: 16px;
+	}
+
+	.floating-bar__logo .custom-logo {
+		max-width: 66px;
+		max-height: 38px;
+	}
+
+	.floating-bar__contacts {
+		grid-column: 2;
+	}
+
+	.floating-bar__contact {
+		width: 42px;
+		padding: 0;
+		justify-content: center;
+		border-left: 0;
+	}
+
+	.floating-bar__icon {
+		width: 24px;
+		height: 24px;
+	}
+
+	.floating-bar__whatsapp {
+		grid-column: 3;
+	}
+}

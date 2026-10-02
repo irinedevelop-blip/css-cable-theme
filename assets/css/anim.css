@@ -59,7 +59,7 @@ html.cssc-motion body{overflow-x:clip}
 .video-play{transition:opacity 1.2s var(--ease-out) .6s,transform 1.4s var(--ease-out) .6s}
 
 /* подчёркивание пунктов меню */
-.main-nav__menu .menu>li>a{position:relative;display:inline-block;padding:6px 0}
+.main-nav__menu .menu>li>a{position:relative;padding:6px 0}
 .main-nav__menu .menu>li>a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1.5px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .6s var(--ease-out)}
 .main-nav__menu .menu>li>a:hover::after,.main-nav__menu .menu>li.current-menu-item>a::after{transform:scaleX(1);transform-origin:left}
 .main-nav__menu .menu a:hover{color:#fff}
@@ -69,21 +69,27 @@ html.cssc-motion body{overflow-x:clip}
 @keyframes csscRing{0%,100%{border-color:rgba(192,72,82,.45)}50%{border-color:rgba(192,72,82,.95)}}
 .video-play .ico{transition:transform .7s var(--ease-out),color .4s}
 
-/* ---------- липкое меню ---------- */
-.site-header__bar.is-sticky{position:fixed;left:0;top:0;right:auto;z-index:800;animation:csscDrop .9s var(--ease-out) both}
-.site-header__bar.is-sticky .main-nav{height:62px;box-shadow:0 18px 40px -12px rgba(0,0,0,.55);transition:height .5s var(--ease-out)}
-.site-header__bar.is-sticky.is-hidden{transform:translate3d(0,-120%,0);transition:transform .6s var(--ease-out);animation:none}
-.site-header__bar.is-sticky:not(.is-hidden){transform:none;transition:transform .7s var(--ease-out)}
-@keyframes csscDrop{from{transform:translate3d(0,-110%,0)}to{transform:none}}
-.admin-bar .site-header__bar.is-sticky{top:32px}
+ 
 
 /* ---------- кнопки ---------- */
 .btn{position:relative;overflow:hidden;isolation:isolate;transition:background-color .5s var(--ease-out),transform .6s var(--ease-out),box-shadow .6s var(--ease-out)}
 .btn::before{content:none}
 .btn--accent:hover{transform:none;box-shadow:none}
-.btn-ico{overflow:hidden;position:relative}
-.btn-ico .ico{transition:transform .55s var(--ease-out)}
-.btn:hover .btn-ico .ico{animation:csscArrow .6s var(--ease-out)}
+.btn-ico {
+	position: relative;
+	overflow: hidden;
+}
+
+.btn-ico > .ico {
+	position: relative;
+	z-index: 2;
+	transition: transform 0.55s var(--ease-out);
+}
+
+.btn:hover .btn-ico > .ico {
+	animation: csscArrow 0.6s var(--ease-out);
+}
+
 @keyframes csscArrow{0%{transform:none}45%{transform:translate(120%,-120%)}46%{transform:translate(-120%,120%)}100%{transform:none}}
 .sq-btn{transition:background-color .45s var(--ease-out),color .45s var(--ease-out),transform .45s var(--ease-out)}
 .sq-btn:hover{transform:scale(1.06)}

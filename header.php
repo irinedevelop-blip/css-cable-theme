@@ -36,7 +36,7 @@ $logo_l    = cssc_opt( 'cssc_logo_light' );
 			<div class="topbar__contacts">
 				<?php if ( $phone ) : ?><a class="topbar__item" href="tel:<?php echo esc_attr( preg_replace( '/[^\d+]/', '', $phone ) ); ?>"><span class="round-ico"><?php echo cssc_icon( 'phone' ); // phpcs:ignore ?></span><span><?php echo esc_html( $phone ); ?></span></a><?php endif; ?>
 				<?php if ( $email ) : ?><a class="topbar__item" href="mailto:<?php echo esc_attr( $email ); ?>"><span class="round-ico"><?php echo cssc_icon( 'mail' ); // phpcs:ignore ?></span><span><?php echo esc_html( $email ); ?></span></a><?php endif; ?>
-				<?php if ( $addr ) : ?><a class="topbar__item" href="<?php echo esc_url( home_url( '/kontakty/' ) ); ?>"><span class="round-ico"><?php echo cssc_icon( 'pin' ); // phpcs:ignore ?></span><span><?php echo esc_html( $addr ); ?></span></a><?php endif; ?>
+				<?php if ( $addr ) : ?><a class="topbar__item topbar__item--address" href="<?php echo esc_url( home_url( '/kontakty/' ) ); ?>"><span class="round-ico"><?php echo cssc_icon( 'pin' ); // phpcs:ignore ?></span><span><?php echo esc_html( $addr ); ?></span></a><?php endif; ?>
 			</div>
 		</div>
 		<button class="topbar__burger" type="button" aria-label="Меню" data-drawer-toggle><?php echo cssc_icon( 'burger' ); // phpcs:ignore ?></button>
@@ -57,18 +57,121 @@ $logo_l    = cssc_opt( 'cssc_logo_light' );
 				<?php if ( cssc_opt( 'cssc_show_cart' ) && function_exists( 'WC' ) && WC()->cart ) : ?>
 					<a class="main-nav__cart" href="<?php echo esc_url( wc_get_cart_url() ); ?>" aria-label="Корзина"><?php echo cssc_icon( 'cart' ); // phpcs:ignore ?><span class="cart-count"><?php echo esc_html( WC()->cart->get_cart_contents_count() ); ?></span></a>
 				<?php endif; ?>
-				<button class="main-nav__search" type="button" aria-label="Поиск" data-search-toggle><?php echo cssc_icon( 'search' ); // phpcs:ignore ?></button>
+				<button
+	class="main-nav__search"
+	type="button"
+	aria-label="<?php esc_attr_e( 'Поиск товаров', 'css-cable' ); ?>"
+	aria-expanded="false"
+	data-product-search-open
+>
+	<?php echo cssc_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+</button>
+
 			</div>
 		</nav>
 	</div>
-	<div class="search-overlay" data-search>
-		<form role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-			<input type="search" name="s" placeholder="Поиск по сайту и каталогу…" value="<?php echo esc_attr( get_search_query() ); ?>">
-			<?php if ( class_exists( 'WooCommerce' ) ) : ?><input type="hidden" name="post_type" value="product"><?php endif; ?>
-			<button type="submit"><?php echo cssc_icon( 'search' ); // phpcs:ignore ?></button>
-			<button type="button" class="search-overlay__close" data-search-toggle aria-label="Закрыть"><?php echo cssc_icon( 'close' ); // phpcs:ignore ?></button>
-		</form>
+<?php if ( class_exists( 'WooCommerce' ) ) : ?>
+	<div
+		class="product-search"
+		data-product-search
+		aria-hidden="true"
+	>
+		<button
+			class="product-search__backdrop"
+			type="button"
+			data-product-search-close
+			aria-label="<?php esc_attr_e( 'Закрыть поиск', 'css-cable' ); ?>"
+			tabindex="-1"
+		></button>
+
+		<section
+			class="product-search__panel"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="product-search-title"
+		>
+			<div class="product-search__head">
+				<div>
+					<span class="product-search__eyebrow">
+						<?php esc_html_e( 'Каталог CSS Cable', 'css-cable' ); ?>
+					</span>
+
+					<h2 id="product-search-title">
+						<?php esc_html_e( 'Поиск продукции', 'css-cable' ); ?>
+					</h2>
+				</div>
+
+				<button
+					class="product-search__close"
+					type="button"
+					data-product-search-close
+					aria-label="<?php esc_attr_e( 'Закрыть поиск', 'css-cable' ); ?>"
+				>
+					<?php echo cssc_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</button>
+			</div>
+
+			<form
+				class="product-search__form"
+				role="search"
+				method="get"
+				action="<?php echo esc_url( home_url( '/' ) ); ?>"
+				data-product-search-form
+			>
+				<label class="screen-reader-text" for="product-search-field">
+					<?php esc_html_e( 'Название или артикул товара', 'css-cable' ); ?>
+				</label>
+
+				<span class="product-search__field-icon">
+					<?php echo cssc_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</span>
+
+				<input
+					id="product-search-field"
+					class="product-search__field"
+					type="search"
+					name="s"
+					value=""
+					placeholder="<?php esc_attr_e( 'Название кабеля или артикул', 'css-cable' ); ?>"
+					autocomplete="off"
+					spellcheck="false"
+					data-product-search-input
+				>
+
+				<input type="hidden" name="post_type" value="product">
+
+				<button class="product-search__submit" type="submit">
+					<span><?php esc_html_e( 'Найти', 'css-cable' ); ?></span>
+					<?php echo cssc_icon( 'arrow-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</button>
+			</form>
+
+			<div
+				class="product-search__status"
+				data-product-search-status
+				aria-live="polite"
+			>
+				Начните вводить название или артикул товара
+			</div>
+
+			<div
+				class="product-search__results"
+				data-product-search-results
+			></div>
+
+			<a
+				class="product-search__all"
+				href="<?php echo esc_url( add_query_arg( 'post_type', 'product', home_url( '/' ) ) ); ?>"
+				data-product-search-all
+				hidden
+			>
+				<span><?php esc_html_e( 'Показать все результаты', 'css-cable' ); ?></span>
+				<?php echo cssc_icon( 'arrow-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</a>
+		</section>
 	</div>
+<?php endif; ?>
+
 </header>
 
 <aside class="drawer" data-drawer aria-hidden="true">

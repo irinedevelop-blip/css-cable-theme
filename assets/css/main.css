@@ -12,7 +12,7 @@ body{margin:0;font-family:var(--font);font-size:16px;line-height:1.5;color:var(-
 img{max-width:100%;height:auto;display:block}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;cursor:pointer}
-.container{width:100%;max-width:var(--container);margin:0 auto;padding:0 24px}
+.container{width:100%;/* max-width:var(--container); */margin:0 auto;padding: 0 2%;}
 .container--narrow{max-width:860px}
 .ico{display:inline-flex;width:1em;height:1em}
 .ico svg{width:100%;height:100%}
@@ -24,8 +24,55 @@ button{font-family:inherit;cursor:pointer}
 .btn--accent{background:var(--c-accent-2);color:#fff}
 .btn--accent:hover{background:var(--c-accent)}
 .btn--lg{font-size:16px;padding:14px 14px 14px 22px}
-.btn-ico{display:inline-flex;width:17px;height:17px;border:1.5px solid currentColor;border-radius:3px;padding:2px;flex:0 0 auto}
-.btn-ico .ico{width:100%;height:100%}
+.btn-ico {
+	position: relative;
+	display: inline-grid;
+	place-items: center;
+	flex: 0 0 auto;
+	width: 18px;
+	height: 18px;
+	padding: 2px;
+	overflow: hidden;
+	color: inherit;
+	line-height: 0;
+	border: 1.5px solid currentColor;
+	border-radius: 3px;
+	box-sizing: border-box;
+	isolation: isolate;
+}
+
+.btn-ico > .ico {
+	position: relative;
+	z-index: 2;
+	display: block;
+	flex: none;
+	width: 100%;
+	height: 100%;
+	min-width: 0;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	color: inherit;
+	line-height: 0;
+}
+
+.btn-ico > .ico.ico-arrow-up-right {
+	width: 100%;
+	height: 100%;
+	transform-origin: center;
+}
+
+.btn-ico > .ico > svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	overflow: visible;
+	color: inherit;
+	stroke: currentColor;
+}
+
 .pill{display:inline-block;font-size:14px;line-height:1;padding:6px 12px;border-radius:40px;color:#fff}
 .pill--accent{border:2px solid var(--c-accent)}
 .sq-btn{width:40px;height:37px;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:var(--c-dark);border:0;transition:.2s}
@@ -91,13 +138,7 @@ button{font-family:inherit;cursor:pointer}
 .video-modal__frame iframe,.video-modal__frame video{width:100%;height:100%;border:0;display:block}
 .video-modal__close{position:absolute;right:20px;top:20px;background:none;border:0;color:#fff;width:40px;height:40px}
 .video-modal__close .ico{width:30px;height:30px}
-.search-overlay{position:absolute;left:0;right:0;top:100%;background:var(--c-navy);padding:18px 0;display:none}
-.search-overlay.is-open{display:block}
-.search-overlay form{max-width:var(--container);margin:0 auto;padding:0 24px;display:flex;gap:10px}
-.search-overlay input{flex:1;height:46px;border:0;border-radius:var(--radius);padding:0 16px;font:15px var(--font)}
-.search-overlay button{width:46px;height:46px;border:0;border-radius:var(--radius);background:var(--c-accent);color:#fff;display:inline-flex;align-items:center;justify-content:center}
-.search-overlay button .ico{width:18px;height:18px}
-.search-overlay .search-overlay__close{background:transparent;border:1px solid rgba(255,255,255,.3)}
+ 
 
 /* ---------- Hero ---------- */
 .cssc-hero{background:var(--c-dark);color:#fff;padding:52px 0 60px}
@@ -322,3 +363,14 @@ button{font-family:inherit;cursor:pointer}
 .elementor .cp-detail__cable,.cp-detail .cp-detail__cable{height:112%!important;width:auto!important;max-width:none!important}
 .elementor .cssc-product__img img,.elementor .cssc-product__img video{height:100%!important;width:auto!important}
 @media (max-width:900px){.elementor .cp-detail__cable,.cp-detail .cp-detail__cable{height:100%!important}}
+.cable-product__breadcrumbs nav {
+    font-size: 9px;
+}
+
+h1.cable-product__title {
+    font-size: 58px;
+}
+
+.cable-product__gost {
+    font-size: 21px;
+}

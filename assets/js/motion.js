@@ -162,31 +162,7 @@
 	}
 
 	/* ---------- липкое меню ---------- */
-	var bar = document.querySelector('.site-header__bar'), spacer = null, lastY = 0, barTop = 0;
-	function measureBar() {
-		if (!bar) return;
-		var was = bar.classList.contains('is-sticky');
-		if (was) bar.classList.remove('is-sticky');
-		barTop = bar.getBoundingClientRect().top + window.scrollY + bar.offsetHeight;
-		if (was) bar.classList.add('is-sticky');
-	}
-	function sticky(y) {
-		if (!bar || cfg.sticky === false) return;
-		var should = y > barTop + 120;
-		if (should && !bar.classList.contains('is-sticky')) {
-			spacer = spacer || document.createElement('div');
-			spacer.style.height = bar.offsetHeight + 'px'; spacer.className = 'site-header__spacer';
-			bar.parentNode.insertBefore(spacer, bar); bar.classList.add('is-sticky');
-		} else if (!should && bar.classList.contains('is-sticky')) {
-			bar.classList.remove('is-sticky', 'is-hidden'); spacer && spacer.parentNode && spacer.parentNode.removeChild(spacer);
-		}
-		if (bar.classList.contains('is-sticky')) {
-			if (y > lastY + 4 && y > barTop + 400) bar.classList.add('is-hidden');
-			else if (y < lastY - 4) bar.classList.remove('is-hidden');
-		}
-		lastY = y;
-	}
-
+	
 	/* ---------- параллакс ---------- */
 	var hv = document.querySelector('.site-header__video');
 	var header = document.querySelector('.site-header--video');
@@ -286,7 +262,9 @@
 	function raf(time) {
 		if (lenis) lenis.raf(time);
 		var y = window.scrollY;
-		parallax(y); sticky(y); manualCheck(time || performance.now());
+		parallax(y);
+manualCheck(time || performance.now());
+
 		if (cursor) { cx += (tx - cx) * 0.18; cy += (ty - cy) * 0.18; cursor.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0)'; }
 		if (ticking) requestAnimationFrame(raf);
 	}
@@ -297,9 +275,15 @@
 	}
 	CSSC.motionInit = initAll;
 
-	initAll(); video(); measureBar();
+	initAll();
+video();
 	requestAnimationFrame(raf);
-	window.addEventListener('resize', function () { measureBar(); lenis && lenis.resize(); });
+	window.addEventListener('resize', function () {
+	if (lenis) {
+		lenis.resize();
+	}
+});
+
 
 	// интро: всё, что в первом экране, запускаем после загрузки
 	function loaded() {
